@@ -106,7 +106,8 @@ model_flags.run_recreation    = true;
 %      order to correclty calculate baselines for each of the NEV modules.
 % ------------------------------------------------------------------------
 base_ceh_lcm = '2020';
-baseline_lu = readtable('nep_baseline_lu.csv');
+landuse_data_path = 'D:\Documents\GitHub\NERC--Agile-Sprint\Data\';
+baseline_lu = readtable(strcat(landuse_data_path, 'nep_baseline_lu.csv'));
 parameters.base_ceh_lcm = base_ceh_lcm;
 
 baseline_lu.farm_ha = baseline_lu.arable_ha + baseline_lu.grass_ha;
@@ -133,7 +134,7 @@ baseline_lu.grass_ha = [];
 
 % 2.2. Load scenario land use
 % ---------------------------
-scenario_lu = readtable('nep_baseline_lu.csv');
+scenario_lu = readtable(strcat(landuse_data_path, 'nep_baseline_lu.csv'));
 scenario_lu.wood_ha = scenario_lu.wood_ha + scenario_lu.arable_ha + scenario_lu.grass_ha;
 scenario_lu.arable_ha = zeros(height(scenario_lu), 1);
 scenario_lu.grass_ha = zeros(height(scenario_lu), 1);
