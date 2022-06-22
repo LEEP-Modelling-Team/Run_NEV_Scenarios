@@ -15,7 +15,7 @@ function parameters = fcn_set_parameters()
 
 % Data paths
 % ----------
-parent_dir                       = 'D:\Documents\GitHub\NERC--Agile-Sprint\NEV\Model Data\';
+parent_dir                        = 'D:\Documents\NEV\Model Data\';
 parameters.lcm_data_folder        = 'D:\Documents\GitHub\NERC--Agile-Sprint\Data\LCM\LCM_2km\';
 
 parameters.agriculture_data_folder          = [parent_dir, 'Agriculture\'];
