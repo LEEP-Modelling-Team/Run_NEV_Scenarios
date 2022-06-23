@@ -54,7 +54,7 @@ function option_table = fcn_find_option(options, scenario_land_cover, baseline_l
             end
         end
         % as farm is the combination of arable and grass, the inclusion of
-        % the farm2xyz options is redundant
+        % the rarm2
         if any(contains(option_list, 'farm'))
             idx = contains(option_list, 'farm');
             option_list(idx) = [];                    
