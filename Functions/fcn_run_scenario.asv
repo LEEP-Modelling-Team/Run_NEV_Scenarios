@@ -111,11 +111,9 @@ function  [benefits, costs, env_outs, es_outs] = fcn_run_scenario(model_flags, .
     % Possible land use changes
     options = parameters.options;
     % Identify for each cell the option/s implemented
-    disp('Identifying land use changes by cell')
-    disp('------------------------------------')
-    tic
+    disp('Identify land use changes by cell')
+    disp('---------------------------------')
     scenario_opts = fcn_find_option(options, scenario_land_cover, baseline_land_cover, baseline, scenario);
-    toc
 
     % Identify unique options that happen on the landscape
     [~, col] = find(table2array(scenario_opts));

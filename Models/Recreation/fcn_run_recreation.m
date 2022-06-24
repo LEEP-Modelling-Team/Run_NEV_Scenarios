@@ -392,7 +392,7 @@ function es_recreation = fcn_run_recreation(parameters, hash, rec_baseline_lu, s
 
         % (4.c.1) ORVal LC Parameters
         % ---------------------------
-        nevo_include_read_params; 
+        [model, params] = fcn_nevo_include_read_params(model, conn); 
 
         % (4.c.2) Calculate new expv1 with new landcovers
         % -----------------------------------------------

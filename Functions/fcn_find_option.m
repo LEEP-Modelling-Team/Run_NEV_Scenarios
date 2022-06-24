@@ -27,7 +27,8 @@ function option_table = fcn_find_option(options, scenario_land_cover, baseline_l
     is_positive = @(x) x > 0;
     is_negative = @(x) x < 0;
 
-    option_table = scenario_land_cover(:, 1);
+    option_table = array2table(baseline.es_agriculture.new2kid);
+    option_table.Properties.VariableNames = {'new2kid'};
     option_table = [option_table, array2table(zeros(height(option_table), length(options)))];
     option_table.Properties.VariableNames(2:end) = options;
     
@@ -53,12 +54,17 @@ function option_table = fcn_find_option(options, scenario_land_cover, baseline_l
                 option_list{j} = strcat(opt_from, '2', opt_to);
             end
         end
-        % as farm is the combination of arable and grass, the inclusion of
-        % the farm2xyz options is redundant
-        if any(contains(option_list, 'farm'))
-            idx = contains(option_list, 'farm');
-            option_list(idx) = [];                    
+        
+        if(isempty(option_list))
+            continue
+        else
+            % as farm is the combination of arable and grass, the inclusion of
+            % the farm2xyz options is redundant
+            if any(contains(option_list, 'farm'))
+                idx = contains(option_list, 'farm');
+                option_list(idx) = [];                    
+            end
+            option_table{i, option_list} = ones(1, length(option_list));
         end
-        option_table{i, option_list} = ones(1, length(option_list));
     end
 end
