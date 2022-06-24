@@ -1,4 +1,4 @@
-function [model, params] = fcn_nevo_include_read_parameters(model, conn)
+function [model, params] = fcn_nevo_include_read_params(model)
     % Model references and parameters
     % -------------------------------
     switch model.type
@@ -31,10 +31,10 @@ function [model, params] = fcn_nevo_include_read_parameters(model, conn)
             model.tbl_params = 'parameters_xmnl3';
             model.params     = 'b_xmnl3';
     end
-
+    conn = fcn_connect_database(false);
     sqlquery = strcat('SELECT * FROM nevo.', model.tbl_params);
-    curs = exec(conn,sqlquery);
     setdbprefs('DataReturnFormat','cellarray')
+    curs = exec(conn, sqlquery);
     curs = fetch(curs);
     params = curs.Data;
     close(curs);
