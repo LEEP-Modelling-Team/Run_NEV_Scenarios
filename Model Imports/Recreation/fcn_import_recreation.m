@@ -333,7 +333,7 @@ function NEVO_ORVal_chgsite_data = fcn_import_recreation(uk_baseline, ...
 
     % (a) ORVal LC Parameters
     % -----------------------
-    nevo_include_read_params; 
+    [model, params] = fcn_nevo_include_read_params(model); 
 
     % (b) Calculate new expv1 with new landcovers
     % -------------------------------------------
