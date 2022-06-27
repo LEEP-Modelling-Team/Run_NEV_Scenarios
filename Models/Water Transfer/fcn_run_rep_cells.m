@@ -15,6 +15,10 @@ function fcn_run_rep_cells(options, parameters, hash)
     % (a) Define land use changes/options
     % -----------------------------------
     num_options = length(options);
+    
+    which_opt = cellfun(@(a) split(a, '_'), {options}, 'UniformOutput', false);
+    which_opt = vertcat(which_opt{:});
+    which_opt = which_opt(:,:,2);
 
     % (e) Subcatchment information
     % ----------------------------
@@ -33,7 +37,9 @@ function fcn_run_rep_cells(options, parameters, hash)
     %  =====================
     for i = 1:num_options
         % Get this option name
-        option_i = options{i};
+        option_i = which_opt{i};
+        option_i = split(option_i, '.');
+        option_i = option_i{1};
 
         % (a) Load land use changes for this option
         % -----------------------------------------
