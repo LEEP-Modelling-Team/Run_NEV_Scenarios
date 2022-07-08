@@ -131,6 +131,7 @@ function lcs_scenario_options = fcn_calc_option_lc(options, unique_options, base
                     land.farm_ha = land.farm_ha - hectares_chg;
                 case {'wood', 'sngrass'}
                     land{:, col_from} = land{:, col_from} - hectares_chg;
+                    land.hectares = hectares_chg;
             end
             
             % add land to 'to'
