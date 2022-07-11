@@ -229,25 +229,41 @@ function  [benefits, costs, env_outs, es_outs] = fcn_run_scenario(model_flags, .
                                                          bio_baseline_lc, ... 
                                                          parameters.biodiversity_climate_string, ...
                                                          parameters.other_ha);
-        
-        baseline.sr_100_20 = es_baseline_jncc.sr_100_20;
-        baseline.sr_100_30 = es_baseline_jncc.sr_100_30;
-        baseline.sr_100_40 = es_baseline_jncc.sr_100_40;
-        baseline.sr_100_50 = es_baseline_jncc.sr_100_50;
+        if strcmp(parameters.biodiversity_climate_string, 'current')
+            baseline.sr_100_20 = es_baseline_jncc.sr_100;
+            baseline.sr_100_30 = es_baseline_jncc.sr_100;
+            baseline.sr_100_40 = es_baseline_jncc.sr_100;
+            baseline.sr_100_50 = es_baseline_jncc.sr_100;
+        else
+            baseline.sr_100_20 = es_baseline_jncc.sr_100_20;
+            baseline.sr_100_30 = es_baseline_jncc.sr_100_30;
+            baseline.sr_100_40 = es_baseline_jncc.sr_100_40;
+            baseline.sr_100_50 = es_baseline_jncc.sr_100_50;
+        end
         
         % 3.2 JNCC scenario biodiversity
         % ------------------------------
         if exist('scenario_landuse', 'var')
-            bio_scenario_lc = fcn_create_jncc_lc(scenario_land_cover, es_agriculture_baseline, parameters.biodiversity_climate_string);
+            bio_scenario_lc = fcn_create_jncc_lc(scenario_land_cover, es_agriculture_scenario, parameters.biodiversity_climate_string);            
             es_scenario_jncc = fcn_run_biodiversity_jncc(parameters.biodiversity_data_folder_jncc, ...
                                                              bio_scenario_lc, ... 
                                                              parameters.biodiversity_climate_string, ...
                                                              parameters.other_ha);
-            
-            scenario.sr_100_20 = es_scenario_jncc.sr_100_20;
-            scenario.sr_100_30 = es_scenario_jncc.sr_100_30;
-            scenario.sr_100_40 = es_scenario_jncc.sr_100_40;
-            scenario.sr_100_50 = es_scenario_jncc.sr_100_50;
+            if strcmp(parameters.biodiversity_climate_string, 'current')
+                scenario.sr_100_20 = es_scenario_jncc.sr_100;
+                scenario.sr_100_30 = es_scenario_jncc.sr_100;
+                scenario.sr_100_40 = es_scenario_jncc.sr_100;
+                scenario.sr_100_50 = es_scenario_jncc.sr_100;
+                es_scenario_jncc.sr_100_20 = es_scenario_jncc.sr_100;
+                es_scenario_jncc.sr_100_30 = es_scenario_jncc.sr_100;
+                es_scenario_jncc.sr_100_40 = es_scenario_jncc.sr_100;
+                es_scenario_jncc.sr_100_50 = es_scenario_jncc.sr_100;
+            else
+                scenario.sr_100_20 = es_scenario_jncc.sr_100_20;
+                scenario.sr_100_30 = es_scenario_jncc.sr_100_30;
+                scenario.sr_100_40 = es_scenario_jncc.sr_100_40;
+                scenario.sr_100_50 = es_scenario_jncc.sr_100_50;
+            end
         end
     end
     
