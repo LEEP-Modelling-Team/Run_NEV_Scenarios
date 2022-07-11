@@ -18,10 +18,13 @@ function quantity_bio = fcn_calc_quantity_bio(start_year, end_year, num_extra_ye
     % Calculate difference between scenario and baseline
     diff_sr_100 = scenario_sr_100(:, start_year:end_year) - baseline_sr_100(:, start_year:end_year);
     
+    % calculate percentage change
+    perc_change = (scenario_sr_100(:, start_year:end_year) - baseline_sr_100(:, start_year:end_year)) ./  baseline_sr_100(:, start_year:end_year);
+    
 %     % Set negative differences to zero
 %     diff_sr_100(diff_sr_100 < 0) = 0;
     
     % Sum to get biodiversity quantity change
-    quantity_bio = nansum(diff_sr_100, 2);
+    quantity_bio = nanmean(perc_change, 2);
     
 end
