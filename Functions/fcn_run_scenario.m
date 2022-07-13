@@ -524,304 +524,305 @@ function  [benefits, costs, env_outs, es_outs] = fcn_run_scenario(model_flags, .
         if ~exist('scenario_landuse', 'var')
             error('To compute ecosystem service values for flooding and water quality a scenario land use is required')
         else
-            run_folder = strcat(parameters.water_transfer_data_folder, ...
-                'Runs\', hash, '\');
-            file_list = dir(run_folder); 
-            file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
-            if ~isfolder(run_folder) | isempty(file_list)
-                mkdir(run_folder);
-                % 5.1. Run the water imports and save the data
-                % --------------------------------------------
-                disp('Importing hydrology data')
-                disp('------------------------')
+            
+            % 5.1. Run the water imports and save the data
+            % --------------------------------------------
+            disp('Importing hydrology data')
+            disp('------------------------')
 
-                fcn_ImportWaterTransfer(uk_landuses, es_agriculture_uk, parameters, model_flags, conn);
+            fcn_ImportWaterTransfer(uk_landuses, es_agriculture_uk, parameters, model_flags, conn);
 
 
-                % 5.2. Base runs. These need to be done only once for each 
-                %      baseline land use passed. Whenever a new baseline land 
-                %      use is passed, we hash it, run the water functions to 
-                %      compute baseline flow and we store the results into a 
-                %      folder whose name is the hash and the location is 
-                %      Model Data\Water Transfer\Base Run\'hash key'. This 
-                %      allows us to check whether the base run data already 
-                %      exists for thespecified baseline land use.
-                % -------------------------------------------------------------
-                disp('Baseline runs for the hydrology models')
-                disp('--------------------------------------')
+            % 5.2. Base runs. These need to be done only once for each 
+            %      baseline land use passed. Whenever a new baseline land 
+            %      use is passed, we hash it, run the water functions to 
+            %      compute baseline flow and we store the results into a 
+            %      folder whose name is the hash and the location is 
+            %      Model Data\Water Transfer\Base Run\'hash key'. This 
+            %      allows us to check whether the base run data already 
+            %      exists for thespecified baseline land use.
+            % -------------------------------------------------------------
+            disp('Baseline runs for the hydrology models')
+            disp('--------------------------------------')
 
-                base_run_folder = strcat(parameters.water_transfer_data_folder, ...
-                                         'Base Run\', hash);
-                if isfolder(base_run_folder)
-                    if dirsize(base_run_folder) == 0
-                        tic
-                        fcn_WaterTransfer_base_run(uk_landuses, parameters, hash);
-                        toc
-                    end
-                else
-                    mkdir(base_run_folder)
+            base_run_folder = strcat(parameters.water_transfer_data_folder, ...
+                                     'Base Run\', hash);
+            if isfolder(base_run_folder)
+                if dirsize(base_run_folder) == 0
                     tic
                     fcn_WaterTransfer_base_run(uk_landuses, parameters, hash);
                     toc
                 end
+            else
+                mkdir(base_run_folder)
+                tic
+                fcn_WaterTransfer_base_run(uk_landuses, parameters, hash);
+                toc
+            end
 
-                % 5.3. Summarise base_run data
-                % ----------------------------
-                disp('Summarise baseline hydrology runs')
-                disp('---------------------------------')
+            % 5.3. Summarise base_run data
+            % ----------------------------
+            disp('Summarise baseline hydrology runs')
+            disp('---------------------------------')
 
-                base_run_summary_folder = strcat(parameters.water_transfer_data_folder, ...
-                                                 'Base Run Summary\', hash);
-                if isfolder(base_run_summary_folder)
-                    if dirsize(base_run_summary_folder) == 0
-                        tic
-                        subctch_summary = fcn_get_baseline_summary_data(parameters, hash);
-                        save([base_run_summary_folder, '\baseline_summary_data.mat'], 'subctch_summary')
-                        toc
-                    end
-                else
-                    mkdir(base_run_summary_folder)
+            base_run_summary_folder = strcat(parameters.water_transfer_data_folder, ...
+                                             'Base Run Summary\', hash);
+            if isfolder(base_run_summary_folder)
+                if dirsize(base_run_summary_folder) == 0
                     tic
                     subctch_summary = fcn_get_baseline_summary_data(parameters, hash);
                     save([base_run_summary_folder, '\baseline_summary_data.mat'], 'subctch_summary')
                     toc
                 end
+            else
+                mkdir(base_run_summary_folder)
+                tic
+                subctch_summary = fcn_get_baseline_summary_data(parameters, hash);
+                save([base_run_summary_folder, '\baseline_summary_data.mat'], 'subctch_summary')
+                toc
+            end
 
-                % 5.4. Get baseline flow for the flooding model
-                % ---------------------------------------------
-                disp('Calculate baseline flow for flooding')
-                disp('------------------------------------')
+            % 5.4. Get baseline flow for the flooding model
+            % ---------------------------------------------
+            disp('Calculate baseline flow for flooding')
+            disp('------------------------------------')
 
-                base_flow_folder = strcat(parameters.water_transfer_data_folder, ...
-                                                 'Baseline Flow Transfer\', hash);
-                if isfolder(base_flow_folder)
-                    if dirsize(base_flow_folder) == 0
-                        tic
-                        flow_results = fcn_get_baseline_flow_transfer(parameters, hash);
-                        save([base_flow_folder, '\baseline_flow_transfer.mat'], 'flow_results', 'subctch_ids')
-                        toc
-                    end
-                else
-                    mkdir(base_flow_folder)
+            base_flow_folder = strcat(parameters.water_transfer_data_folder, ...
+                                             'Baseline Flow Transfer\', hash);
+            if isfolder(base_flow_folder)
+                if dirsize(base_flow_folder) == 0
                     tic
-                    [flow_results, subctch_ids] = fcn_get_baseline_flow_transfer(parameters, hash);
+                    flow_results = fcn_get_baseline_flow_transfer(parameters, hash);
                     save([base_flow_folder, '\baseline_flow_transfer.mat'], 'flow_results', 'subctch_ids')
                     toc
                 end
+            else
+                mkdir(base_flow_folder)
+                tic
+                [flow_results, subctch_ids] = fcn_get_baseline_flow_transfer(parameters, hash);
+                save([base_flow_folder, '\baseline_flow_transfer.mat'], 'flow_results', 'subctch_ids')
+                toc
+            end
 
-                % 5.5. Import flooding transfer
-                % -----------------------------
-                flooding_folder = strcat(parameters.flooding_transfer_data_folder, ...
-                                         hash);
+            % 5.5. Import flooding transfer
+            % -----------------------------
+            flooding_folder = strcat(parameters.flooding_transfer_data_folder, ...
+                                     hash);
 
-                if isfolder(flooding_folder)
-                    if dirsize(flooding_folder) == 0
-                        tic
-                        FloodingTransfer = fcn_ImportFloodingTransfer(parameters, hash, conn);
-                        save([flooding_folder, '\NEVO_Flooding_Transfer_data_', num2str(parameters.event_parameter), '.mat'], 'FloodingTransfer');
-                        toc
-                    end
-                else
-                    mkdir(flooding_folder)
+            if isfolder(flooding_folder)
+                if dirsize(flooding_folder) == 0
                     tic
                     FloodingTransfer = fcn_ImportFloodingTransfer(parameters, hash, conn);
                     save([flooding_folder, '\NEVO_Flooding_Transfer_data_', num2str(parameters.event_parameter), '.mat'], 'FloodingTransfer');
                     toc
-                end                     
-
-                % 5.6. Run all possible land use changes that allow to compute
-                %      water quality and flooding values per hectare when we 
-                %      run the water and flooding models for the representative 
-                %      cells in each sub-basin.
-                %      AAA: this is not to be confused with the land use change 
-                %      from the baseline to the scenario defined in 2.1. and 
-                %      2.2. in run_NEV.m
-                %
-                %      (script1_run_landuse_change in Github\water-runs or 
-                %      defra-elms water runs)
-                % -------------------------------------------------------------
-                disp('Set land use changes for representative cells')
-                disp('---------------------------------------------')
-
-                fcn_run_landuse_change(uk_landuses, options, parameters, hash)
-
-
-                % 5.7. Identify representative cells for all posible land use
-                %      changes. This are going to be 1) arable, 2) farm 
-                %      grassland, 3) woodland, 4) seminatural grassland, 
-                %      5) farmland. 
-                %      (script2_get_rep_cells in Github\water-runs or 
-                %      defra-elms water runs)
-                % -----------------------------------------------------------
-                disp('Identify representative cells')
-                disp('-----------------------------')
-
-                land_from = {};
-                for i = 1:length(options)
-                    from = split(options(i), '2');
-                    from = from(1);
-                    land_from(i) = from;
-                end
-
-                land_from = unique(land_from);
-
-                rep_cell_folder = strcat(parameters.water_transfer_data_folder, ...
-                                         'Representative Cells\', hash);
-                % if the rep. cells for the specified set of options already
-                % exist, skip, else create folder for specified hashed land use
-                % and find and save representative cells. 
-                if isfolder(rep_cell_folder)
-                    file_list = dir(rep_cell_folder); 
-                    file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
-                    req_fields = strcat('rep_cell_', land_from, '.mat');
-                    avail_fields = {file_list(:).name};
-                    intsct = intersect(req_fields, avail_fields);
-                    if length(intsct) < length(land_from)
-                        fcn_get_rep_cells(uk_landuses, land_from, parameters, hash);
-                    end
-                else
-                    mkdir(rep_cell_folder)
-                    fcn_get_rep_cells(uk_landuses, parameters, hash);
-                end
-
-                % 5.8. Run the representative cells for the land use changes
-                %     AAA: it takes about 10 hours for each land use change!!!
-                %     (script3_run_rep_cells in Github\water-runs or 
-                %     defra-elms water runs)
-                % ------------------------------------------------------------
-                disp('Run representative cells')
-                disp('------------------------')
-
-                if isfolder(rep_cell_folder)
-                    file_list = dir(rep_cell_folder); 
-                    file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
-                    req_fields = strcat('water_', options, '.mat');
-                    avail_fields = {file_list(:).name};
-                    intsct = intersect(req_fields, avail_fields);
-                    missing_options = setdiff(req_fields, avail_fields);
-                    if ~isempty(missing_options)
-                        fcn_run_rep_cells(missing_options, parameters, hash);
-                    end
-                else
-                    error('No folder was found containing data for the representative cells.')
-                end
-
-                % 5.9. Add non-use water quality to representative cells
-                %      (script4_add_non_use_water_quality in Github\water-runs  
-                %      or defra-elms water runs)
-                % -------------------------------------------------------------
-                disp('Add water quality values')
-                disp('------------------------')
-
-                for i = 1:numel(options)
-                    file = load(strcat(rep_cell_folder, '\', req_fields{i}));
-                    input_struct = fieldnames(file);
-                    input_struct = input_struct{1};
-                    file = file.(input_struct);
-                    colnames = {'non_use_value_20', 'non_use_value_30', ...
-                        'non_use_value_40', 'non_use_value_50'};
-                    diff = setdiff(colnames, file.Properties.VariableNames);
-                    if ~isempty(diff)
-                        fcn_add_non_use_wq(options, parameters, hash)
-                    end
-                end
-
-                % 5.10. Add water treatment costs/savings to representative
-                %       cells.
-                %       (script5_add_water_treatment in Github\water-runs or 
-                %       defra-elms water runs)
-                % ----------------------------------------------------------
-                disp('Add water treatment savings/costs')
-                disp('---------------------------------')
-
-                for i = 1:numel(options)
-                    file = load(strcat(rep_cell_folder, '\', req_fields{i}));
-                    input_struct = fieldnames(file);
-                    input_struct = input_struct{1};
-                    file = file.(input_struct);
-                    colnames = {'wt_totn_20', 'wt_totn_30', 'wt_totn_40', ...
-                        'wt_totn_50', 'wt_totp_20', 'wt_totp_30', ...
-                        'wt_totp_40', 'wt_totp_50'};
-                    diff = setdiff(colnames, file.Properties.VariableNames);
-                    if ~isempty(diff)
-                        fcn_add_water_treatment(options, parameters, hash, conn);
-                    end
-                end
-
-                % 5.11. Use representative cells for the land use changes from 
-                %       the baseline as passed in run_NEV.m 2.1. and 2.2.
-                %       (script6_use_rep_cells in Github\water-runs or 
-                %       defra-elms water runs)
-                % ------------------------------------------------------------
-                disp('Use representative cells')
-                disp('------------------------')
-
-                % Load representative cells for unique options
-                [water_results, water_cell2subctch, nfm_data] = fcn_load_rep_cells(parameters, ...
-                                                                                   unique_opts, ...
-                                                                                   conn, ...
-                                                                                   hash);
-
-                % Loop for unique options
-                num_ha = zeros(cell_info.ncells, 1);
-                for i = 1:numel(unique_opts)
-                    option = unique_opts{i};
-                    ha_option = lcs_scenario_options.(option).hectares;
-
-                    % Run rep. cells for unique options: Water quality transfer table
-                    water_quality_transfer_table = fcn_run_water_quality_transfer_from_results(cell_info, option, ha_option, water_results, water_cell2subctch);
-
-                    % Run rep. cells for unique options: Water quality transfer non use table
-                    water_non_use_transfer_table = fcn_run_water_transfer_non_use_from_results(cell_info, option, ha_option, water_results, water_cell2subctch, parameters.assumption_nonuse);
-
-                    % Run rep. cells for unique options: Flooding
-                    flooding_transfer_table = fcn_run_flooding_transfer_from_results(cell_info, option, ha_option, water_results, water_cell2subctch, nfm_data, parameters.assumption_flooding);
-
-                    % !!! temporary: move chgq5 from non use to flooding
-                    flooding_transfer_table = [flooding_transfer_table, water_non_use_transfer_table(:, {'chgq5_20', 'chgq5_30', 'chgq5_40', 'chgq5_50'})];
-                    water_non_use_transfer_table = water_non_use_transfer_table(:, {'new2kid', 'non_use_value_20', 'non_use_value_30', 'non_use_value_40', 'non_use_value_50'});
-
-                    water_tables.(option).water_quality_transfer_table = water_quality_transfer_table;
-                    water_tables.(option).water_non_use_transfer_table = water_non_use_transfer_table;
-                    water_tables.(option).flooding_transfer_table = flooding_transfer_table;
-
-                    num_ha = num_ha + ha_option;
-                end
-
-                % sum values and benefits together if more than one option 
-                list_tables = fieldnames(water_tables);
-                if length(list_tables) > 1
-                    first_table = water_tables.(list_tables{1});
-                    water_quality_transfer_table = first_table.water_quality_transfer_table;
-                    water_non_use_transfer_table = first_table.water_non_use_transfer_table;
-                    flooding_transfer_table = first_table.flooding_transfer_table;
-                    for j = 2:length(list_tables)
-                        temp_table = water_tables.(list_tables{j});
-                        water_quality_transfer_table{:, 2:end} = water_quality_transfer_table{:, 2:end} + temp_table.water_quality_transfer_table{:, 2:end};
-                        water_non_use_transfer_table{:, 2:end} = water_non_use_transfer_table{:, 2:end} + temp_table.water_non_use_transfer_table{:, 2:end};
-                        flooding_transfer_table{:, 2:end} = flooding_transfer_table{:, 2:end} + temp_table.flooding_transfer_table{:, 2:end};
-                    end
-                else
-                    first_table = water_tables.(list_tables{1});
-                    water_quality_transfer_table = first_table.water_quality_transfer_table;
-                    water_non_use_transfer_table = first_table.water_non_use_transfer_table;
-                    flooding_transfer_table = first_table.flooding_transfer_table;
-                end
-
-                run_folder = strcat(parameters.water_transfer_data_folder, ...
-                    'Runs\', hash, '\');
-                file_list = dir(run_folder); 
-                file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
-
-                if ~isfolder(rep_cell_folder)
-                    mkdir(run_cell_folder)
-                    save(strcat(run_folder, 'water_results.mat'), 'water_quality_transfer_table', 'water_non_use_transfer_table', 'flooding_transfer_table');
-                elseif isempty(file_list)
-                    save(strcat(run_folder, 'water_results.mat'), 'water_quality_transfer_table', 'water_non_use_transfer_table', 'flooding_transfer_table');
                 end
             else
-                disp('Water models already run. Collecting output...')
+                mkdir(flooding_folder)
+                tic
+                FloodingTransfer = fcn_ImportFloodingTransfer(parameters, hash, conn);
+                save([flooding_folder, '\NEVO_Flooding_Transfer_data_', num2str(parameters.event_parameter), '.mat'], 'FloodingTransfer');
+                toc
+            end                     
+
+            % 5.6. Run all possible land use changes that allow to compute
+            %      water quality and flooding values per hectare when we 
+            %      run the water and flooding models for the representative 
+            %      cells in each sub-basin.
+            %      AAA: this is not to be confused with the land use change 
+            %      from the baseline to the scenario defined in 2.1. and 
+            %      2.2. in run_NEV.m
+            %
+            %      (script1_run_landuse_change in Github\water-runs or 
+            %      defra-elms water runs)
+            % -------------------------------------------------------------
+            disp('Set land use changes for representative cells')
+            disp('---------------------------------------------')
+
+            fcn_run_landuse_change(uk_landuses, options, parameters, hash)
+
+
+            % 5.7. Identify representative cells for all posible land use
+            %      changes. This are going to be 1) arable, 2) farm 
+            %      grassland, 3) woodland, 4) seminatural grassland, 
+            %      5) farmland. 
+            %      (script2_get_rep_cells in Github\water-runs or 
+            %      defra-elms water runs)
+            % -----------------------------------------------------------
+            disp('Identify representative cells')
+            disp('-----------------------------')
+
+            land_from = {};
+            for i = 1:length(options)
+                from = split(options(i), '2');
+                from = from(1);
+                land_from(i) = from;
             end
+
+            land_from = unique(land_from);
+
+            rep_cell_folder = strcat(parameters.water_transfer_data_folder, ...
+                                     'Representative Cells\', hash);
+            % if the rep. cells for the specified set of options already
+            % exist, skip, else create folder for specified hashed land use
+            % and find and save representative cells. 
+            if isfolder(rep_cell_folder)
+                file_list = dir(rep_cell_folder); 
+                file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
+                req_fields = strcat('rep_cell_', land_from, '.mat');
+                avail_fields = {file_list(:).name};
+                intsct = intersect(req_fields, avail_fields);
+                if length(intsct) < length(land_from)
+                    fcn_get_rep_cells(uk_landuses, land_from, parameters, hash);
+                else
+                    disp('    Representative cells already identified')
+                end
+            else
+                mkdir(rep_cell_folder)
+                fcn_get_rep_cells(uk_landuses, parameters, hash);
+            end
+
+            % 5.8. Run the representative cells for the land use changes
+            %     AAA: it takes about 10 hours for each land use change!!!
+            %     (script3_run_rep_cells in Github\water-runs or 
+            %     defra-elms water runs)
+            % ------------------------------------------------------------
+            disp('Run representative cells')
+            disp('------------------------')
+
+            if isfolder(rep_cell_folder)
+                file_list = dir(rep_cell_folder); 
+                file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
+                req_fields = strcat('water_', options, '.mat');
+                avail_fields = {file_list(:).name};
+                intsct = intersect(req_fields, avail_fields);
+                missing_options = setdiff(req_fields, avail_fields);
+                if ~isempty(missing_options)
+                    fcn_run_rep_cells(missing_options, parameters, hash);
+                else
+                    disp('    Representative cells already run')
+                end
+            else
+                error('No folder was found containing data for the representative cells.')
+            end
+
+            % 5.9. Add non-use water quality to representative cells
+            %      (script4_add_non_use_water_quality in Github\water-runs  
+            %      or defra-elms water runs)
+            % -------------------------------------------------------------
+            disp('Add water quality values')
+            disp('------------------------')
+
+            for i = 1:numel(options)
+                file = load(strcat(rep_cell_folder, '\', req_fields{i}));
+                input_struct = fieldnames(file);
+                input_struct = input_struct{1};
+                file = file.(input_struct);
+                colnames = {'non_use_value_20', 'non_use_value_30', ...
+                    'non_use_value_40', 'non_use_value_50'};
+                diff = setdiff(colnames, file.Properties.VariableNames);
+                if ~isempty(diff)
+                    fcn_add_non_use_wq(options, parameters, hash)
+                else
+                    disp('    Water quality values already added')
+                end
+            end
+
+            % 5.10. Add water treatment costs/savings to representative
+            %       cells.
+            %       (script5_add_water_treatment in Github\water-runs or 
+            %       defra-elms water runs)
+            % ----------------------------------------------------------
+            disp('Add water treatment savings/costs')
+            disp('---------------------------------')
+
+            for i = 1:numel(options)
+                file = load(strcat(rep_cell_folder, '\', req_fields{i}));
+                input_struct = fieldnames(file);
+                input_struct = input_struct{1};
+                file = file.(input_struct);
+                colnames = {'wt_totn_20', 'wt_totn_30', 'wt_totn_40', ...
+                    'wt_totn_50', 'wt_totp_20', 'wt_totp_30', ...
+                    'wt_totp_40', 'wt_totp_50'};
+                diff = setdiff(colnames, file.Properties.VariableNames);
+                if ~isempty(diff)
+                    fcn_add_water_treatment(options, parameters, hash, conn);
+                else
+                    disp('    Water treatment values already added')
+                end
+            end
+            
+            run_folder = strcat(parameters.water_transfer_data_folder, ...
+                'Runs\', hash, '\');
+            if ~isfolder(run_folder)
+                mkdir(run_folder);
+            end
+
+            % 5.11. Use representative cells for the land use changes from 
+            %       the baseline as passed in run_NEV.m 2.1. and 2.2.
+            %       (script6_use_rep_cells in Github\water-runs or 
+            %       defra-elms water runs)
+            % ------------------------------------------------------------
+            disp('Use representative cells')
+            disp('------------------------')
+
+            % Load representative cells for unique options
+            [water_results, water_cell2subctch, nfm_data] = fcn_load_rep_cells(parameters, ...
+                                                                               unique_opts, ...
+                                                                               conn, ...
+                                                                               hash);
+
+            % Loop for unique options
+            num_ha = zeros(cell_info.ncells, 1);
+            for i = 1:numel(unique_opts)
+                option = unique_opts{i};
+                ha_option = lcs_scenario_options.(option).hectares;
+
+                % Run rep. cells for unique options: Water quality transfer table
+                water_quality_transfer_table = fcn_run_water_quality_transfer_from_results(cell_info, option, ha_option, water_results, water_cell2subctch);
+
+                % Run rep. cells for unique options: Water quality transfer non use table
+                water_non_use_transfer_table = fcn_run_water_transfer_non_use_from_results(cell_info, option, ha_option, water_results, water_cell2subctch, parameters.assumption_nonuse);
+
+                % Run rep. cells for unique options: Flooding
+                flooding_transfer_table = fcn_run_flooding_transfer_from_results(cell_info, option, ha_option, water_results, water_cell2subctch, nfm_data, parameters.assumption_flooding);
+
+                % !!! temporary: move chgq5 from non use to flooding
+                flooding_transfer_table = [flooding_transfer_table, water_non_use_transfer_table(:, {'chgq5_20', 'chgq5_30', 'chgq5_40', 'chgq5_50'})];
+                water_non_use_transfer_table = water_non_use_transfer_table(:, {'new2kid', 'non_use_value_20', 'non_use_value_30', 'non_use_value_40', 'non_use_value_50'});
+
+                water_tables.(option).water_quality_transfer_table = water_quality_transfer_table;
+                water_tables.(option).water_non_use_transfer_table = water_non_use_transfer_table;
+                water_tables.(option).flooding_transfer_table = flooding_transfer_table;
+
+                num_ha = num_ha + ha_option;
+            end
+
+            % sum values and benefits together if more than one option 
+            list_tables = fieldnames(water_tables);
+            if length(list_tables) > 1
+                first_table = water_tables.(list_tables{1});
+                water_quality_transfer_table = first_table.water_quality_transfer_table;
+                water_non_use_transfer_table = first_table.water_non_use_transfer_table;
+                flooding_transfer_table = first_table.flooding_transfer_table;
+                for j = 2:length(list_tables)
+                    temp_table = water_tables.(list_tables{j});
+                    water_quality_transfer_table{:, 2:end} = water_quality_transfer_table{:, 2:end} + temp_table.water_quality_transfer_table{:, 2:end};
+                    water_non_use_transfer_table{:, 2:end} = water_non_use_transfer_table{:, 2:end} + temp_table.water_non_use_transfer_table{:, 2:end};
+                    flooding_transfer_table{:, 2:end} = flooding_transfer_table{:, 2:end} + temp_table.flooding_transfer_table{:, 2:end};
+                end
+            else
+                first_table = water_tables.(list_tables{1});
+                water_quality_transfer_table = first_table.water_quality_transfer_table;
+                water_non_use_transfer_table = first_table.water_non_use_transfer_table;
+                flooding_transfer_table = first_table.flooding_transfer_table;
+            end
+
+            run_folder = strcat(parameters.water_transfer_data_folder, ...
+                'Runs\', hash, '\');
+            file_list = dir(run_folder); 
+            file_list = file_list(cellfun(@(a)a > 0, {file_list.bytes}));
+            
+            save(strcat(run_folder, 'water_results.mat'), 'water_quality_transfer_table', 'water_non_use_transfer_table', 'flooding_transfer_table');
         end
     end
     
