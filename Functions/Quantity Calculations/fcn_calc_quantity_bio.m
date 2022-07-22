@@ -26,5 +26,6 @@ function quantity_bio = fcn_calc_quantity_bio(start_year, end_year, num_extra_ye
     
     % Sum to get biodiversity quantity change
     quantity_bio = nanmean(diff_sr_100, 2);
+%     quantity_bio = nanmean(baseline_sr_100, 2);
     
 end
