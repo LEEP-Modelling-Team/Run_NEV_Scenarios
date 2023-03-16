@@ -18,7 +18,11 @@ function fcn_run_rep_cells(options, parameters, hash)
     
     which_opt = cellfun(@(a) split(a, '_'), {options}, 'UniformOutput', false);
     which_opt = vertcat(which_opt{:});
-    which_opt = which_opt(:,:,2);
+    if length(size(which_opt)) == 2
+        which_opt = which_opt(2,:);
+    else
+        which_opt = which_opt(:,:, 2);
+    end
 
     % (e) Subcatchment information
     % ----------------------------
@@ -224,6 +228,14 @@ function fcn_run_rep_cells(options, parameters, hash)
         results_option_i.subctch_id = rep_cells_option_i.subctch_id;
         results_option_i.new2kid = rep_cells_option_i.new2kid;
         results_option_i.hectares = rep_cells_option_i.hectares;
+        
+        switch option_i   
+            case {'arable2sng', 'arable2wood', 'arable2mixed', 'arable2thirds', ...
+                  'grass2sng', 'grass2wood', 'grass2mixed', 'grass2thirds'}
+                limit2reduction = true;
+            otherwise
+                limit2reduction = false;
+        end
 
         tic
     %     for j = 1:num_rep_cells
@@ -263,7 +275,7 @@ function fcn_run_rep_cells(options, parameters, hash)
                                                                   affected_subctch_id, ...
                                                                   flow_transfer_temp, ...
                                                                   parameters.event_parameter, ...
-                                                                  false);
+                                                                  limit2reduction);
 
             % Sum value across affected subcatchments to get flood value for this cell
             % Save the 3 different flood values for comparison
